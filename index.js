@@ -22,8 +22,6 @@ const mongo_url = process.env.MONGO;
 (async () => {
     try {
         mongoose.connect(mongo_url, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
             serverSelectionTimeoutMS: 5000,
         });
         console.log("Database Connected!");
