@@ -17,14 +17,12 @@ export const checkAuth = (req, res) => {
 
 export const login = async (req, res) => {
     // validation process
-
     const validateLoginInput = async payload => {
         const rules = {
-            email: "email | required",
-            password: "required | min:3 | max:20",
+            email: "email|required",
+            password: "required|min:3|max:20",
         };
         const messages = {
-            "name.required": "Please choose a unique username for your account",
             "email.required": "Enter a valid email address.",
             "password.required": "Enter a valid password.",
             "password.min": "The password must be at least 3 characters long.",
@@ -34,10 +32,15 @@ export const login = async (req, res) => {
 
     const generateToken = (userId, userName) => {
         const secretKey = process.env.JWT_SECRET;
-        return jwt.sign({ _id: userId, name: userName }, secretKey);
+        return jwt.sign({ _id: userId, name: userName }, secretKey, {
+            expiresIn: "1h",
+        }); // Adding expiration time
     };
 
     try {
+        // Log the incoming request for debugging
+        console.log("Login request received", req.body);
+
         // validation process
         await validateLoginInput(req.body);
 
@@ -45,12 +48,14 @@ export const login = async (req, res) => {
         // check user email
         const user = await UserModel.findOne({ email });
         if (!user) {
-            return res.json(errorJson("Email Not Found!", null));
+            console.log("Email not found");
+            return res.status(400).json(errorJson("Email Not Found!", null));
         }
         // check password
-        const checkPassword = bcrypt.compareSync(password, user.password);
+        const checkPassword = await bcrypt.compare(password, user.password); // Use async version of bcrypt
         if (!checkPassword) {
-            return res.json(errorJson("Wrong Password!", null));
+            console.log("Wrong password");
+            return res.status(400).json(errorJson("Wrong Password!", null));
         }
         // jwt process
         const access_token = generateToken(user._id, user.name);
@@ -63,7 +68,10 @@ export const login = async (req, res) => {
             .status(200)
             .json(successJson("Login Successfully!", userData));
     } catch (error) {
-        return res.json(errorJson("Validation Failed!", error));
+        console.error("Validation Failed!", error);
+        return res
+            .status(500)
+            .json(errorJson("Validation Failed!", error.message));
     }
 };
 
