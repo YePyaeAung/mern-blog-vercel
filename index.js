@@ -21,7 +21,11 @@ dotenv.config();
 const mongo_url = process.env.MONGO;
 (async () => {
     try {
-        mongoose.connect(mongo_url);
+        mongoose.connect(mongo_url, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            serverSelectionTimeoutMS: 5000,
+        });
         console.log("Database Connected!");
     } catch (error) {
         console.log(error.message);
@@ -53,4 +57,4 @@ app.get("/", async (req, res) => {
 
 app.listen(1234, () => {
     console.log(`API is running!`);
-});
+}).setTimeout(9000);
