@@ -48,9 +48,9 @@ app.use("/api/auth/article", ArticleLikeRouter);
 
 // test route
 app.get("/", async (req, res) => {
-    // const article_user = await ArticleModel.find().populate("user", "name");
-    // return res.json(article_user);
-    res.json("Deployment is Okay!!!");
+    const article_user = await ArticleModel.find().populate("user", "name");
+    return res.json(article_user);
+    // res.json("Deployment is Okay!!!");
 });
 
 app.listen(1234, () => {
