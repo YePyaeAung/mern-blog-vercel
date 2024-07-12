@@ -12,7 +12,7 @@ import CheckAuth from "../middleware/CheckAuth.js";
 const router = express.Router();
 
 // middleware
-router.use(CheckAuth);
+// router.use(CheckAuth);
 
 router.get("/tags-languages", getTagsAndLanguages);
 router.post("/", store);
